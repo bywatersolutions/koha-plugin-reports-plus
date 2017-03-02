@@ -56,11 +56,17 @@ sub report {
     my ( $self, $args ) = @_;
     my $cgi = $self->{'cgi'};
 
-    unless ( $cgi->param('output') ) {
+    unless ( $cgi->param('next') ) {
         $self->report_step1();
     }
-    else {
+    elsif ( $cgi->param('next') == 2 ) {
         $self->report_step2();
+    }
+    elsif ( $cgi->param('next') == 3 ){
+        $self->report_step3();
+    }
+    else {
+        $self->report_step4();
     }
 }
 
@@ -190,13 +196,6 @@ sub report_step1 {
 
     my $template = $self->get_template({ file => 'report-step1.tt' });
 
-    my @libraries = Koha::Libraries->search;
-    my @categories = Koha::Patron::Categories->search_limited({}, {order_by => ['description']});
-    $template->param(
-        libraries => \@libraries,
-        categories => \@categories,
-    );
-
     print $cgi->header();
     print $template->output();
 }
@@ -207,50 +206,23 @@ sub report_step2 {
 
     my $dbh = C4::Context->dbh;
 
-    my $branch                = $cgi->param('branch');
-    my $category_code         = $cgi->param('categorycode');
-    my $borrower_municipality = $cgi->param('borrower_municipality');
-    my $output                = $cgi->param('output');
-
-    my $fromDay   = $cgi->param('fromDay');
-    my $fromMonth = $cgi->param('fromMonth');
-    my $fromYear  = $cgi->param('fromYear');
-
-    my $toDay   = $cgi->param('toDay');
-    my $toMonth = $cgi->param('toMonth');
-    my $toYear  = $cgi->param('toYear');
-
-    my ( $fromDate, $toDate );
-    if ( $fromDay && $fromMonth && $fromYear && $toDay && $toMonth && $toYear )
-    {
-        $fromDate = "$fromYear-$fromMonth-$fromDay";
-        $toDate   = "$toYear-$toMonth-$toDay";
-    }
+    my $report                = $cgi->param('report_id');
+    my $output               = $cgi->param('output') || "";
 
     my $query = "
-        SELECT firstname, surname, address, city, zipcode, city, zipcode, dateexpiry FROM borrowers 
-        WHERE branchcode LIKE '$branch'
-        AND categorycode LIKE '$category_code'
+        SELECT savedsql FROM saved_sql WHERE id=?
     ";
 
-    if ( $fromDate && $toDate ) {
-        $query .= "
-            AND DATE( dateexpiry ) >= DATE( '$fromDate' )
-            AND DATE( dateexpiry ) <= DATE( '$toDate' )  
-        ";
-    }
-
     my $sth = $dbh->prepare($query);
-    $sth->execute();
+    $sth->execute($report);
 
     my @results;
     while ( my $row = $sth->fetchrow_hashref() ) {
-        $row->{'dateexpiry'} =
-          C4::Dates->new( $row->{'dateexpiry'}, 'iso' )->output();
+        ( $row->{params} ) = $row->{savedsql} =~ /<<(.*?)>>/;
+        warn $row->{params};
         push( @results, $row );
     }
-
-    my $date = C4::Dates->new();
+warn Data::Dumper::Dumper( @results );
 
     my $filename;
     if ( $output eq "csv" ) {
@@ -263,17 +235,51 @@ sub report_step2 {
     }
 
     my $template = $self->get_template({ file => $filename });
- 
+
     $template->param(
-        date_ran     => C4::Dates->new()->output(),
         results_loop => \@results,
-        branch       => GetBranchName($branch),
     );
 
-    unless ( $category_code eq '%' ) {
-        $template->param( category_code => $category_code );
+    print $template->output();
+}
+
+sub report_step3 {
+    my ( $self, $args ) = @_;
+    my $cgi = $self->{'cgi'};
+
+
+    my $template = $self->get_template({ file => 'report-step3.tt' });
+    
+    my @params;
+    for (my $i=0; $i < $cgi->param('param_count'); $i++ ){
+#        $template->param( "param_".$i => $cgi->param('param'.$i), );
+        push( @params, $cgi->param('param'.$i) );
     }
 
+    $template->param(
+            param_loop => \@params,
+    );
+    print $cgi->header();
+    print $template->output();
+}
+
+sub report_step4 {
+    my ( $self, $args ) = @_;
+    my $cgi = $self->{'cgi'};
+
+
+    my $template = $self->get_template({ file => 'report-step4.tt' });
+    
+    my @params;
+    for (my $i=0; $i < $cgi->param('param_count'); $i++ ){
+#        $template->param( "param_".$i => $cgi->param('param'.$i), );
+        push( @params, $cgi->param('param'.$i) );
+    }
+
+    $template->param(
+            param_loop => \@params,
+    );
+    print $cgi->header();
     print $template->output();
 }
 
