@@ -1,0 +1,37 @@
+[% INCLUDE 'doc-head-open.inc' %]
+ <title>Koha: Report plus: Report params</title>
+ <script type="text/javascript" src="[% PLUGIN_PATH %]/datepicker/js/datepicker.js"></script>
+ <link href="[% PLUGIN_PATH %]/datepicker/css/datepicker.css" rel="stylesheet" type="text/css" />
+[% INCLUDE 'doc-head-close.inc' %]
+</head>
+<body>
+[% INCLUDE 'header.inc' %]
+[% INCLUDE 'cat-search.inc' %]
+
+<div id="breadcrumbs"><a href="/cgi-bin/koha/mainpage.pl">Home</a> &rsaquo; <a href="/cgi-bin/koha/plugins/plugins-home.pl">Plugins</a> &rsaquo; Report plus &rsaquo; Report params</div>
+
+<div id="doc3">
+
+
+<table border=1>
+  <thead>
+    <tr>
+    [% FOREACH key IN result_loop.0.keys %]
+      [% SET chain = loop.index keychain.$chain = key %]
+      <th>[% key %]</th>
+    [% END %]
+    </tr>
+  </thead>
+
+  <tbody>   
+[% FOREACH r IN result_loop %]
+    <tr>
+    [% FOREACH chain IN keychain %]
+    <td>[% SET index=loop.index %][% SET hash_index = keychain.$index %][% r.$hash_index %]</td>
+    [% END %]
+    </tr>
+[% END %]
+  </tbody>
+</table>
+
+[% INCLUDE 'intranet-bottom.inc' %]

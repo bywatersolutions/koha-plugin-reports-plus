@@ -60,6 +60,7 @@ sub report {
         $self->report_step1();
     }
     elsif ( $cgi->param('next') == 2 ) {
+        warn "Calling step 2";
         $self->report_step2();
     }
     elsif ( $cgi->param('next') == 3 ){
@@ -206,8 +207,8 @@ sub report_step2 {
 
     my $dbh = C4::Context->dbh;
 
-    my $report                = $cgi->param('report_id');
-    my $output               = $cgi->param('output') || "";
+    my $report    = $cgi->param('report_id');
+    my $output    = $cgi->param('output') || "";
 
     my $query = "
         SELECT savedsql FROM saved_sql WHERE id=?
@@ -223,23 +224,14 @@ sub report_step2 {
         push( @results, $row );
     }
 warn Data::Dumper::Dumper( @results );
-
-    my $filename;
-    if ( $output eq "csv" ) {
-        print $cgi->header( -attachment => 'borrowers.csv' );
-        $filename = 'report-step2-csv.tt';
-    }
-    else {
-        print $cgi->header();
-        $filename = 'report-step2-html.tt';
-    }
-
-    my $template = $self->get_template({ file => $filename });
+    my $template = $self->get_template({ file => 'report-step2.tt' });
 
     $template->param(
         results_loop => \@results,
+        report_id => $report,
     );
-
+warn "print step2";
+    print $cgi->header();
     print $template->output();
 }
 
@@ -247,6 +239,7 @@ sub report_step3 {
     my ( $self, $args ) = @_;
     my $cgi = $self->{'cgi'};
 
+    my $report  = $cgi->param('report_id');
 
     my $template = $self->get_template({ file => 'report-step3.tt' });
     
@@ -256,8 +249,11 @@ sub report_step3 {
         push( @params, $cgi->param('param'.$i) );
     }
 
+
     $template->param(
             param_loop => \@params,
+            report_id => $report,
+            param_count => $cgi->param('param_count'),
     );
     print $cgi->header();
     print $template->output();
@@ -267,60 +263,70 @@ sub report_step4 {
     my ( $self, $args ) = @_;
     my $cgi = $self->{'cgi'};
 
+    my $report = $cgi->param('report_id');
+    my $output = $cgi->param('output');
 
-    my $template = $self->get_template({ file => 'report-step4.tt' });
-    
+    my $query = "SELECT savedsql FROM saved_sql WHERE id=?";
+    my $dbh = C4::Context->dbh;
+    my $sth = $dbh->prepare($query);
+    $sth->execute($report);
+
+    $query  = $sth->fetchrow_hashref()->{savedsql};
+    my @query_params = ( $query =~ /<<(.*?)>>/ );
+
     my @params;
     for (my $i=0; $i < $cgi->param('param_count'); $i++ ){
-#        $template->param( "param_".$i => $cgi->param('param'.$i), );
-        push( @params, $cgi->param('param'.$i) );
+        warn $cgi->param('param'.$i.".type");
+        warn $cgi->param('param'.$i);
+        my $param;
+        if ( $cgi->param('param'.$i.".type") eq 'textarea' ) {
+            warn "here";
+            $param = "(";
+            my @arr_par = split /\n/, $cgi->param('param'.$i);
+            my $param_placeholder = ( '?,' ) x @arr_par;
+            $param_placeholder =~ s/,$/)/;
+            $param_placeholder = '('.$param_placeholder;
+            $query =~ s/<<$query_params[$i]>>/$param_placeholder/;
+            foreach  my $par ( @arr_par ) {
+                $par =~ s/\r$//;
+#$param .= $par.",";
+                push( @params, $par );
+            }
+#           $param =~ s/,$/)/;
+        }
+        else { $param = $cgi->param('param'.$i);
+        push( @params, $param );
+        }
+    }
+warn Data::Dumper::Dumper($query);
+warn Data::Dumper::Dumper(@params);
+
+    $sth = $dbh->prepare($query);
+
+    my @results;
+
+    $sth->execute(@params);
+warn "rows are ".$sth->rows;
+    while ( my $row = $sth->fetchrow_hashref() ) {
+        warn Data::Dumper::Dumper( $row );
+        push( @results, $row );
     }
 
+
+    my $filename;
+    if ( $output eq "csv" ) {
+        print $cgi->header( -attachment => 'borrowers.csv' );
+        $filename = 'report-step4-csv.tt';
+    }
+    else {
+        print $cgi->header();
+        $filename = 'report-step4-html.tt';
+    }
+
+    my $template = $self->get_template({ file => $filename });
     $template->param(
-            param_loop => \@params,
+            result_loop => \@results,
     );
-    print $cgi->header();
-    print $template->output();
-}
-
-sub tool_step1 {
-    my ( $self, $args ) = @_;
-    my $cgi = $self->{'cgi'};
-
-    my $template = $self->get_template({ file => 'tool-step1.tt' });
-
-    print $cgi->header();
-    print $template->output();
-}
-
-sub tool_step2 {
-    my ( $self, $args ) = @_;
-    my $cgi = $self->{'cgi'};
-
-    my $template = $self->get_template({ file => 'tool-step2.tt' });
-
-    my $borrowernumber = C4::Context->userenv->{'number'};
-    my $borrower = GetMember( borrowernumber => $borrowernumber );
-    $template->param( 'victim' => $borrower );
-
-    ModMember( borrowernumber => $borrowernumber, firstname => 'Bob' );
-
-    my $dbh = C4::Context->dbh;
-
-    my $table = $self->get_qualified_table_name('mytable');
-
-    my $sth   = $dbh->prepare("SELECT DISTINCT(borrowernumber) FROM $table");
-    $sth->execute();
-    my @victims;
-    while ( my $r = $sth->fetchrow_hashref() ) {
-        push( @victims, GetMember( borrowernumber => $r->{'borrowernumber'} ) );
-    }
-    $template->param( 'victims' => \@victims );
-    
-    $dbh->do( "INSERT INTO $table ( borrowernumber ) VALUES ( ? )",
-        undef, ($borrowernumber) );
-
-    print $cgi->header();
     print $template->output();
 }
 

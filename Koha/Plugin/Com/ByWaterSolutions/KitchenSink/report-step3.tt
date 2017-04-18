@@ -11,17 +11,32 @@
 <div id="breadcrumbs"><a href="/cgi-bin/koha/mainpage.pl">Home</a> &rsaquo; <a href="/cgi-bin/koha/plugins/plugins-home.pl">Plugins</a> &rsaquo; Report Plus &rsaquo; Select report</div>
 
 <div id="doc3">
-	<h3>Choose report to work with</h3>
+	<h3>Fill in the params</h3>
 
-        <!-- Notice our form here has no 'action', this is good, it means that our forms will always get passed back to 'plugins/run.pl'. You could hard code it instead if you prefer -->
+<!-- Notice our form here has no 'action', this is good, it means that our forms will always get passed back to 'plugins/run.pl'. You could hard code it instead if you prefer -->
+
 <form method="get">
     <input type="hidden" name="class" value="[% CLASS %]"/>
     <input type="hidden" name="method" value="[% METHOD %]"/>
+    <input type="hidden" name="report_id" value="[% report_id %]"/>
     <input type="hidden" name="next" value="4"/>
+    <input type="hidden" name="param_count" value="[% param_count %]">
+
+<label for="output">Output Data to:</label>
+<select name="output">
+<option value="screen">Display List</option>
+<option value="csv">CSV File</option>
+</select>
 
 [% FOREACH p IN param_loop %]
-    <input type="[% p %]" name="param[% params_loop.loop.index() %]" />
+    [% IF p == 'textarea' %]
+    <input type="hidden" name="param[% loop.index() %].type" value="[% p %]">
+    <textarea name="param[% loop.index() %]" autocomplete="off" rows=5></textarea>
+    [% ELSE %]
+    <input type="[% p %]" name="param[% loop.index() %]" />
+    [% END %]
 [% END %]
+
 
 <input type="submit" value="Run Report" />
 
