@@ -60,7 +60,6 @@ sub report {
         $self->report_step1();
     }
     elsif ( $cgi->param('next') == 2 ) {
-        warn "Calling step 2";
         $self->report_step2();
     }
     elsif ( $cgi->param('next') == 3 ){
@@ -223,14 +222,12 @@ sub report_step2 {
         warn $row->{params};
         push( @results, $row );
     }
-warn Data::Dumper::Dumper( @results );
     my $template = $self->get_template({ file => 'report-step2.tt' });
 
     $template->param(
         results_loop => \@results,
         report_id => $report,
     );
-warn "print step2";
     print $cgi->header();
     print $template->output();
 }
@@ -245,7 +242,6 @@ sub report_step3 {
     
     my @params;
     for (my $i=0; $i < $cgi->param('param_count'); $i++ ){
-#        $template->param( "param_".$i => $cgi->param('param'.$i), );
         push( @params, $cgi->param('param'.$i) );
     }
 
@@ -289,26 +285,20 @@ sub report_step4 {
             $query =~ s/<<$query_params[$i]>>/$param_placeholder/;
             foreach  my $par ( @arr_par ) {
                 $par =~ s/\r$//;
-#$param .= $par.",";
                 push( @params, $par );
             }
-#           $param =~ s/,$/)/;
         }
         else { $param = $cgi->param('param'.$i);
         push( @params, $param );
         }
     }
-warn Data::Dumper::Dumper($query);
-warn Data::Dumper::Dumper(@params);
 
     $sth = $dbh->prepare($query);
 
     my @results;
 
     $sth->execute(@params);
-warn "rows are ".$sth->rows;
     while ( my $row = $sth->fetchrow_hashref() ) {
-        warn Data::Dumper::Dumper( $row );
         push( @results, $row );
     }
 
