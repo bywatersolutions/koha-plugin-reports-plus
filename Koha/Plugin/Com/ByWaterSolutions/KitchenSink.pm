@@ -218,8 +218,11 @@ sub report_step2 {
 
     my @results;
     while ( my $row = $sth->fetchrow_hashref() ) {
-        ( $row->{params} ) = $row->{savedsql} =~ /<<(.*?)>>/;
-        warn $row->{params};
+#        $row->{params}  = [split /(<<[^>>]+>>)/,$row->{savedsql}];
+        my @split_parms  = split /(<<[^>>]+>>)/,$row->{savedsql};
+        my @parms = grep { $_ =~ s/(<<)([^>>]+)(>>)/$2/g } @split_parms;
+        $row->{params} = \@parms;
+        warn Data::Dumper::Dumper( $row);
         push( @results, $row );
     }
     my $template = $self->get_template({ file => 'report-step2.tt' });
