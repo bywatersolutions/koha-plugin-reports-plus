@@ -271,15 +271,15 @@ sub report_step4 {
     $sth->execute($report);
 
     $query  = $sth->fetchrow_hashref()->{savedsql};
-    my @query_params = ( $query =~ /<<(.*?)>>/ );
+    my @split_parms = split /(<<[^>>]+>>)/, $query ;
+    my @query_params = grep { $_ =~ s/(<<)([^>>]+)(>>)/$2/g } @split_parms;
+    
+#    my @query_params = ( $query =~ /<<(.*?)>>/ );
 
     my @params;
     for (my $i=0; $i < $cgi->param('param_count'); $i++ ){
-        warn $cgi->param('param'.$i.".type");
-        warn $cgi->param('param'.$i);
         my $param;
         if ( $cgi->param('param'.$i.".type") eq 'textarea' ) {
-            warn "here";
             $param = "(";
             my @arr_par = split /\n/, $cgi->param('param'.$i);
             my $param_placeholder = ( '?,' ) x @arr_par;
@@ -292,6 +292,7 @@ sub report_step4 {
             }
         }
         else { $param = $cgi->param('param'.$i);
+        $query =~ s/<<$query_params[$i]>>/?/;
         push( @params, $param );
         }
     }
