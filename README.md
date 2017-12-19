@@ -23,18 +23,18 @@ Once set up is complete you will need to alter your UseKohaPlugins system prefer
 # Using
 
 * Create a report in the Koha reports module.
-..* To utilise the list functionality syntax should in:
+  * To utilise the list functionality syntax should in:
 VALUE in (<<List parameter>>)
-..* The plugin will add the necessary commas between list entries
+  * The plugin will add the necessary commas between list entries
 
 * Run the plugin.
 * Enter the report number for the you created above.
 * The plugin scans the report for parameters and asks you for the type of each, you can choose:
-..* List
-..* Date
-..* Text
+  * List
+  * Date
+  * Text
 * The next step will ask you for values
-..* All parameters must be filled
-..* You may choose results in CSV or HTML
+  * All parameters must be filled
+  * You may choose results in CSV or HTML
 * Voila!
 
