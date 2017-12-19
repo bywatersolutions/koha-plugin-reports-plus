@@ -24,7 +24,7 @@ Once set up is complete you will need to alter your UseKohaPlugins system prefer
 
 * Create a report in the Koha reports module.
   * To utilise the list functionality syntax should in:
-VALUE in (<<List parameter>>)
+`VALUE in (<<List parameter>>)`
   * The plugin will add the necessary commas between list entries
 
 * Run the plugin.
