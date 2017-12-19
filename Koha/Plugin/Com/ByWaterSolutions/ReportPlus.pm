@@ -24,7 +24,7 @@ our $metadata = {
     description =>
 'This plugin adds some enhancements to the reports from Koha. Notably the ability to enter a list of data as a parameter',
     date_authored   => '2017-01-01',
-    date_updated    => '2017-12-18',
+    date_updated    => '1900-01-01',
     minimum_version => '17.05.00.000',
     maximum_version => undef,
     version         => $VERSION,
