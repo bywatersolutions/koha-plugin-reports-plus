@@ -1,3 +1,0 @@
-[% FOREACH key IN result_loop.0.keys %][% SET chain = loop.index %][% SET keychain.$chain = key %][% key %][% UNLESS loop.index == result_loop.0.size - 1 %],[% END %][% END %]
-[% FOREACH r IN result_loop %][% FOREACH chain IN keychain %][% SET index = loop.index %][% SET hash_index = keychain.$index %]"[% r.$hash_index %]"[% UNLESS loop.index == keychain.size - 1 %],[% END %][% END %]
-[% END %]
