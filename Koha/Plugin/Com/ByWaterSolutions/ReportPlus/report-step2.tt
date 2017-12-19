@@ -1,0 +1,53 @@
+[% INCLUDE 'doc-head-open.inc' %]
+ <title>Koha: Report plus: Report params</title>
+ <script type="text/javascript" src="[% PLUGIN_PATH %]/datepicker/js/datepicker.js"></script>
+ <link href="[% PLUGIN_PATH %]/datepicker/css/datepicker.css" rel="stylesheet" type="text/css" />
+[% INCLUDE 'doc-head-close.inc' %]
+</head>
+<body>
+[% INCLUDE 'header.inc' %]
+[% INCLUDE 'cat-search.inc' %]
+
+<div id="breadcrumbs"><a href="/cgi-bin/koha/mainpage.pl">Home</a> &rsaquo; <a href="/cgi-bin/koha/plugins/plugins-home.pl">Plugins</a> &rsaquo; Report plus &rsaquo; Report params</div>
+
+<div id="doc3">
+[% FOREACH r IN results_loop %]
+<form method="get">
+     <input type="hidden" name="class" value="[% CLASS %]"/>
+     <input type="hidden" name="method" value="[% METHOD %]"/>
+     <input type="hidden" name="report_id" value="[% report_id %]"/>
+     <input type="hidden" name="next" value="3"/>
+<h5>Report code: </h5>
+<p>[% r.savedsql | html %]</p>
+<p>With [% r.params.list.size %] parameters</p>
+     <input type="hidden" name="param_count" value="[% r.params.list.size %]"/>
+<table border=1>
+  <thead>
+    <tr>
+      <th>Params</th>
+      <th>Type</th>
+    </tr>
+  </thead>
+
+  <tbody>
+    [% FOREACH p IN r.params %]
+      <tr>
+        <td>[% p %]</td>
+        <td>
+            <input type="hidden" name="param[% loop.index %]name" value="[% p %]" />
+            <select name="param[% loop.index %]">
+                <option value="date">Date</option>
+                <option value="textarea">List</option>
+                <option value="text">Text</option>
+            </select>
+        </td>
+      </tr>
+    [% END %]
+  </tbody>
+</table>
+<input type="submit" value="Enter params" />
+</form>
+
+[% END %]
+</body>
+[% INCLUDE 'intranet-bottom.inc' %]
