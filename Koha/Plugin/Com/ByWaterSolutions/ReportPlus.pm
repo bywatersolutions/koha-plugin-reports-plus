@@ -15,7 +15,7 @@ use Koha::Patron::Categories;
 use MARC::Record;
 
 ## Here we set our plugin version
-our $VERSION = 2.01;
+our $VERSION = "{VERSION}";
 
 ## Here is our metadata, some keys are required, some are optional
 our $metadata = {
