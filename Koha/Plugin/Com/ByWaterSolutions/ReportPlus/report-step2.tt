@@ -38,7 +38,7 @@
             <select name="param[% loop.index %]">
                 <option value="date">Date</option>
                 <option value="textarea">List</option>
-                <option value="text">Text</option>
+                <option value="text" selected="selected">Text</option>
             </select>
         </td>
       </tr>

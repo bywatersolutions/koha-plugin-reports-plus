@@ -48,7 +48,7 @@
         </td>
         <td>
         [% IF p.type == 'textarea' %]
-            <input type="hidden" name="param[% loop.index() %].type" value="[% p %]">
+            <input type="hidden" name="param[% loop.index() %].type" value="[% p.type %]">
             <textarea required name="param[% loop.index() %]" autocomplete="off" rows=5></textarea>
         [% ELSE %]
             <input required type="[% p.type %]" name="param[% loop.index() %]" />

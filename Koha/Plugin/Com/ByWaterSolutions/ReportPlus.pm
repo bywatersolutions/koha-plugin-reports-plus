@@ -197,12 +197,13 @@ sub report_step4 {
     my @params;
     for (my $i=0; $i < $cgi->param('param_count'); $i++ ){
         my $param;
-        if ( $cgi->param('param'.$i.".type") eq 'textarea' ) {
+        if ( $cgi->param("param".$i.".type") eq 'textarea' ) {
             $param = "(";
             my @arr_par = split /\n/, $cgi->param('param'.$i);
             my $param_placeholder = ( '?,' ) x @arr_par;
-            $param_placeholder =~ s/,$/)/;
-            $param_placeholder = '('.$param_placeholder;
+#            $param_placeholder =~ s/,$/)/;
+            $param_placeholder =~ s/,$//;
+#            $param_placeholder = '('.$param_placeholder;
             $query =~ s/<<$query_params[$i]>>/$param_placeholder/;
             foreach  my $par ( @arr_par ) {
                 $par =~ s/\r$//;
@@ -214,12 +215,16 @@ sub report_step4 {
         push( @params, $param );
         }
     }
-
+    my $prepare_error;
     $sth = $dbh->prepare($query);
+    $prepare_error = $dbh->errstr if $dbh->errstr;
 
     my @results;
 
+    my $execute_error;
     $sth->execute(@params);
+    $execute_error = $dbh->errstr if $dbh->errstr;
+
     while ( my $row = $sth->fetchrow_hashref() ) {
         push( @results, $row );
     }
@@ -237,7 +242,9 @@ sub report_step4 {
 
     my $template = $self->get_template({ file => $filename });
     $template->param(
-            result_loop => \@results,
+            result_loop   => \@results,
+            execute_error => $execute_error,
+            prepare_error => $prepare_error,
     );
     print $template->output();
 }

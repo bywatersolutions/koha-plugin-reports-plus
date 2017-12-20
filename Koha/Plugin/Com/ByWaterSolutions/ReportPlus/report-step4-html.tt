@@ -12,6 +12,12 @@
 
 <div id="doc3">
 
+[% IF ( execute_error || prepare_error ) %]
+<div class="dialog alert">
+    The system encountered the following error(s):<br/>
+    [% execute_error %] [% prepare_error %]<br/>
+    Please check the log for further details.
+[% END %]
 
 <table border=1>
   <thead>
