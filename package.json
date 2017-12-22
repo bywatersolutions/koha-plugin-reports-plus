@@ -1,7 +1,7 @@
 {
-  "name": "koha-reports-plus",
+  "name": "koha-plugin-reports-plus",
   "version": "0.0.3",
-  "previous_version": "0.0.2",
+  "previous_version": "0.0.3",
   "description": "Koha Report Plus Plugin",
   "devDependencies": {
     "gulp": "^3.9.1",
@@ -14,14 +14,14 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/bywatersolutions/koha-reports-plus.git"
+    "url": "git+https://github.com/bywatersolutions/koha-plugin-reports-plus.git"
   },
   "author": "Nick Clemens <nick@bywatersolutions.com>",
   "license": "GPL-3.0",
   "bugs": {
-    "url": "https://github.com/bywatersolutions/koha-reports-plus/issues"
+    "url": "https://github.com/bywatersolutions/koha-plugin-reports-plus/issues"
   },
-  "homepage": "https://github.com/bywatersolutions/koha-reports-plus#readme",
+  "homepage": "https://github.com/bywatersolutions/koha-plugin-reports-plus#readme",
   "dependencies": {
     "datetime": "0.0.3",
     "gulp-replace": "^0.6.1",
