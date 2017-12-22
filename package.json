@@ -1,6 +1,6 @@
 {
   "name": "koha-plugin-reports-plus",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "previous_version": "0.0.3",
   "description": "Koha Report Plus Plugin",
   "devDependencies": {
