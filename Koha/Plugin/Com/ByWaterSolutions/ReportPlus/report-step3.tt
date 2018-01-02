@@ -16,7 +16,7 @@
 
 <!-- Notice our form here has no 'action', this is good, it means that our forms will always get passed back to 'plugins/run.pl'. You could hard code it instead if you prefer -->
 
-<form method="get">
+<form method="post">
     <input type="hidden" name="class" value="[% CLASS %]"/>
     <input type="hidden" name="method" value="[% METHOD %]"/>
     <input type="hidden" name="report_id" value="[% report_id %]"/>
