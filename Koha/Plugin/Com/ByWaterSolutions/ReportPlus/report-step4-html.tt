@@ -22,9 +22,8 @@
 <table border=1>
   <thead>
     <tr>
-    [% FOREACH key IN result_loop.0.keys %]
-      [% SET chain = loop.index keychain.$chain = key %]
-      <th>[% key %]</th>
+    [% FOREACH header IN result_headers %]
+      <th>[% header %]</th>
     [% END %]
     </tr>
   </thead>
@@ -32,8 +31,8 @@
   <tbody>   
 [% FOREACH r IN result_loop %]
     <tr>
-    [% FOREACH chain IN keychain %]
-    <td>[% SET index=loop.index %][% SET hash_index = keychain.$index %][% r.$hash_index %]</td>
+    [% FOREACH datum IN r %]
+    <td>[% datum %]</td>
     [% END %]
     </tr>
 [% END %]

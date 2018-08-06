@@ -225,8 +225,9 @@ sub report_step4 {
     $sth->execute(@params);
     $execute_error = $dbh->errstr if $dbh->errstr;
 
-    while ( my $row = $sth->fetchrow_hashref() ) {
-        push( @results, $row );
+    my $headers =  $sth->{NAME};
+    while ( my $row = $sth->fetchrow_arrayref() ) {
+        push( @results, [@$row] );
     }
 
 
@@ -239,9 +240,9 @@ sub report_step4 {
         print $cgi->header();
         $filename = 'report-step4-html.tt';
     }
-
     my $template = $self->get_template({ file => $filename });
     $template->param(
+            result_headers => $headers,
             result_loop   => \@results,
             execute_error => $execute_error,
             prepare_error => $prepare_error,
